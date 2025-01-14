@@ -15,11 +15,11 @@
   "author": "",
   "dependencies": {
     "@notionhq/client": "2.2.15",
-    "dotenv": "^16.0.1"
+    "dotenv": "~16.4"
   },
   "devDependencies": {
     "@types/node": "~22.10",
-    "prettier": "^2.7.1",
+    "prettier": "~3.4",
     "ts-node": "~10.9",
     "typescript": "~5.7"
   }
