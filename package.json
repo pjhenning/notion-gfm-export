@@ -1,6 +1,6 @@
 {
   "name": "notion-sdk-project",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "private": true,
@@ -14,14 +14,13 @@
   "keywords": [],
   "author": "",
   "dependencies": {
-    "@notionhq/client": "^2.2.2",
+    "@notionhq/client": "2.2.15",
     "dotenv": "^16.0.1"
   },
   "devDependencies": {
-    "@types/dotenv": "^8.2.0",
-    "@types/node": "^18.0.3",
+    "@types/node": "~22.10",
     "prettier": "^2.7.1",
-    "ts-node": "^10.8.2",
-    "typescript": "^4.7.4"
+    "ts-node": "~10.9",
+    "typescript": "~5.7"
   }
 }
