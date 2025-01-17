@@ -1,37 +1,24 @@
-import fs from 'node:fs';
 import { Client } from "@notionhq/client";
-import { BlockObjectResponse, RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
-import dotenv from "dotenv";
+import type { BlockObjectResponse, RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
+//import dotenv from "dotenv";
 
-export function main() {
-  dotenv.config();
+function main() {
+  //dotenv.config();
   const pageID = '17bddd82c25580f38e27e2376678fe30';
-  doExport(pageID)
-    .then(() => process.exit(0))
-    .catch((err) => {
-      console.error(err);
-      process.exit(1);
-    });
+  getMarkdownForPage(pageID, '') // TODO: download file
+    .catch((err) => console.error(err));
 }
 
-async function doExport(pageID: string) {
+export async function getMarkdownForPage(pageID: string, notionToken: string) {
   const notion = new Client({
-    auth: process.env.NOTION_TOKEN,
+    auth: notionToken,
   });
   
   let {chunks, headers} = await getChunksFromBlock(pageID, notion, false);
   const chunkStrings = resolveLinkRefsAndMergeComponents(chunks);
   const body = chunkStrings.join('');
   const toc = buildTOC(headers);
-  const content = toc + body;
-
-  try {
-    fs.writeFileSync('./README.md', content);
-    // file written successfully
-    console.log('done!');
-  } catch (err) {
-    console.error(err);
-  }
+  return toc + body;
 }
 
 enum Content {
