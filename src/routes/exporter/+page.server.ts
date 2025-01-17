@@ -10,7 +10,7 @@ export const load: PageServerLoad = async () => {
 
 	return {
     sbData,
-    token: ''
+    token: 'hello'
   };
 
 	error(404, 'Not found');
