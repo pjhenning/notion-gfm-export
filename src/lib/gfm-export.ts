@@ -3,14 +3,21 @@ import { Client } from "@notionhq/client";
 import { BlockObjectResponse, RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import dotenv from "dotenv";
 
-dotenv.config();
+export function main() {
+  dotenv.config();
+  const pageID = '17bddd82c25580f38e27e2376678fe30';
+  doExport(pageID)
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
 
-async function main() {
+async function doExport(pageID: string) {
   const notion = new Client({
     auth: process.env.NOTION_TOKEN,
   });
-
-  const pageID = '17bddd82c25580f38e27e2376678fe30';
   
   let {chunks, headers} = await getChunksFromBlock(pageID, notion, false);
   const chunkStrings = resolveLinkRefsAndMergeComponents(chunks);
@@ -446,10 +453,3 @@ async function processTable(tableID: string, client: Client): Promise<TextCompon
   }
   return tableComponents;
 }
-
-main()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
