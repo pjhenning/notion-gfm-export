@@ -1,16 +1,15 @@
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import { supabase } from '$lib/supabaseClient';
+import { getMarkdownForPage } from '$lib/gfm-export';
 
-export const load: PageServerLoad = async () => {
-  // TODO: get token
-
-  const sb = await supabase.from("main").select();
-  const sbData = sb.data;
-
-	return {
-    token: sbData![0].auth
-  };
-
-	error(404, 'Not found');
-};
+export const actions = {
+	default: async ({ request }) => {
+    const sb = await supabase.from("main").select();
+    const data = await request.formData();
+		const pageID = data.get('pageid') as string;
+		const md = await getMarkdownForPage(pageID, sb.data![0].auth);
+    return {
+      md
+    };
+	}
+} satisfies Actions;

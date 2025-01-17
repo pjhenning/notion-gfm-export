@@ -1,20 +1,22 @@
 <script lang="ts">
-	import type { PageData } from './$types';
-  import { getMarkdownForPage } from '$lib/gfm-export';
+	import type { ActionData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { form }: { form: ActionData } = $props();
 
-	let pageID = $state('Page ID');
-
-	async function doExport(e: Event) {
-		console.log('its happening...');
-		const md = getMarkdownForPage(pageID, data.token);
-		console.log({md});
-		e.preventDefault();
+	if (form?.md) {
+		console.log('here you go:');
+		console.log({md: form.md});
 	}
 </script>
 
 <h1>Exporter</h1>
 
-<input type="text" bind:value={pageID}>
-<button type="submit" onclick={doExport}>Export</button>
+
+{#if form?.md}
+	<h2>Success!</h2>
+{:else}
+<form method="POST">
+	<input type="text" name="pageid">
+	<button type="submit">Export</button>
+</form>
+{/if}
