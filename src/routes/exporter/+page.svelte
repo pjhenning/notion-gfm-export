@@ -8,7 +8,8 @@
 
 	async function doExport() {
 		console.log('its happening...');
-		getMarkdownForPage(pageID, data.token);
+		const md = getMarkdownForPage(pageID, data.token);
+		console.log({md});
 	}
 </script>
 
