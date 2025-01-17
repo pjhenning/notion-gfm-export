@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	},
 		body: JSON.stringify({
 			grant_type: "authorization_code",
-			code: "your-temporary-code",
+			code: url.searchParams.get('code'),
 			redirect_uri: redirectUri,
 		}),
 	});
