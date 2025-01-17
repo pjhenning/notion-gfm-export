@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		title: 'Hello world!',
 		content: 'Welcome to our blog. Lorem ipsum dolor sit amet...',
 		searchParams: [...url.searchParams.entries()],
-		auth: responseJSON.access_token
+		auth: responseJSON
 	};
 
 	error(404, 'Not found');
