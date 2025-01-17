@@ -6,10 +6,11 @@
 
 	let pageID = $state('Page ID');
 
-	async function doExport() {
+	async function doExport(e: Event) {
 		console.log('its happening...');
 		const md = getMarkdownForPage(pageID, data.token);
 		console.log({md});
+		e.preventDefault();
 	}
 </script>
 
