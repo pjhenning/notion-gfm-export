@@ -1,5 +1,6 @@
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
+import { supabase } from '$lib/supabaseClient';
 
 interface NotionAuthResponseJSON {
 	access_token: string;
@@ -28,12 +29,17 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const responseJSON: NotionAuthResponseJSON = await response.json();
 
-	return {
-		title: 'Hello world!',
-		content: 'Welcome to our blog. Lorem ipsum dolor sit amet...',
-		searchParams: [...url.searchParams.entries()],
-		auth: responseJSON
-	};
+	const result = await supabase
+		.from('main')
+		.update({ auth: responseJSON.access_token })
+		.eq('id', 1);
 
-	error(404, 'Not found');
+	if (result.error === null) {
+		return {success: true};
+	} else {
+		return {
+			success: false,
+			error: result.error.message
+		};
+	}
 };

@@ -6,12 +6,6 @@
 
 	let pageID = $state('Page ID');
 
-	console.log('sbData:');
-	console.log(data.sbData);
-
-	console.log('token:');
-	console.log(data.token);
-
 	async function doExport() {
 		console.log('its happening...');
 		getMarkdownForPage(pageID, data.token);
