@@ -7,6 +7,8 @@ export const load: PageServerLoad = async () => {
 
   const sb = await supabase.from("main").select();
   const sbData = sb.data;
+  console.log('heres what we got:');
+  console.log(sbData);
 
 	return {
     sbData,
