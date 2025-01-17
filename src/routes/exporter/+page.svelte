@@ -5,7 +5,7 @@
 
 	if (form?.md) {
 		console.log('here you go:');
-		console.log({md: form.md});
+		console.log({ md: form.md });
 	}
 </script>
 
@@ -15,8 +15,8 @@
 {#if form?.md}
 	<h2>Success!</h2>
 {:else}
+<h2>push button 2 win</h2>
 <form method="POST">
-	<input type="text" name="pageid">
 	<button type="submit">Export</button>
 </form>
 {/if}
