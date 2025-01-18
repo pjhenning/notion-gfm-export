@@ -2,11 +2,6 @@
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
-
-	if (form?.md) {
-		console.log('here you go:');
-		console.log({ md: form.md });
-	}
 </script>
 
 <h1>Exporter</h1>
@@ -14,6 +9,8 @@
 
 {#if form?.md}
 	<h2>Success!</h2>
+	<h3>Here ya go cowboy:</h3>
+	<textarea readonly={true}>{form.md}</textarea>
 {:else}
 <h2>push button 2 win</h2>
 <form method="POST">
