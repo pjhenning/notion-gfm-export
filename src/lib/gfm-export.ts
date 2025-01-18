@@ -46,7 +46,7 @@ function buildTOC(headers: Header[]) {
 }
 
 const space = /\s+/g;
-const remove = /[().`]/g;
+const remove = /[().\/\*`]/g;
 const anchorLink = /<a id="(\S+)" aria-hidden="true">/;
 
 function tryResolveAnchorRef(candidateBlockSegment: string, refLinkTxt: string) {
@@ -66,6 +66,12 @@ function headerRefFromContent(content: string) {
     .replaceAll(remove, '');
 }
 
+function forceMergeTextComponents(components: TextComponent[]) {
+  return components.reduce((merge: string, component) =>
+    merge + component.content
+  , "")
+}
+
 function resolveLinkRefsAndMergeComponents(chunks: Chunk[]): string[] {
   return chunks.map(chunk => {
     const {content} = chunk;
@@ -79,17 +85,16 @@ function resolveLinkRefsAndMergeComponents(chunks: Chunk[]): string[] {
             if (refChunk.content.t === Content.FinalText) {
                 if (refChunk.content.v.startsWith('#')) {
                 // In this case we have a header
-                const formatted =
-                  headerRefFromContent(refChunk.content.v)
-                    .replaceAll('#', '');
+                const formatted = headerRefFromContent(
+                  refChunk.content.v.replaceAll('#', '')
+                );
                 return str + `[${textComponent.content}](#${formatted})`;
               }
               const maybeResolvedLinkString = tryResolveAnchorRef(refChunk.content.v, textComponent.content);
               if (maybeResolvedLinkString) {
                 return str + maybeResolvedLinkString;
               } else {
-                throw new Error('problem trying to resolve block link');
-                return str + textComponent.content;
+                return `!ERR: couldn't resolve anchor ref for ID '${textComponent.refID}'; for text component with content: "${textComponent.content}"!`;
               }
             } else {
               let maybeResolvedLinkString: string | undefined = undefined;
@@ -103,11 +108,11 @@ function resolveLinkRefsAndMergeComponents(chunks: Chunk[]): string[] {
               if (maybeResolvedLinkString) {
                 return str + maybeResolvedLinkString;
               } else {
-                return `ERR: couldn't resolve anchor ref for ID '${textComponent.refID}'; for chunk with content: "${textComponent.content}"`;
+                return `!ERR: couldn't resolve anchor ref for ID '${textComponent.refID}'; for text component with content: "${textComponent.content}"!`;
               }
             }
           } else {
-            return `ERR: couldn't find ref chunk with ID '${textComponent.refID}'; for chunk with content: "${textComponent.content}"`;
+            return `!ERR: couldn't find ref chunk with ID '${textComponent.refID}'; for text component with content: "${textComponent.content}"!`;
           }
         }
       }, '');
@@ -230,31 +235,41 @@ async function getChunksFromBlock(id: string, client: Client, gettingChildren: b
         v = prependToTextComponents(prefix, textComponents);
       }
       if (block.type === 'code') {
-        v = '```' + `${block.code.language}\n` + block.code.rich_text[0].plain_text + '\n```';
+        let lang = block.code.language as string;
+        if (lang === 'plain text') lang = '';
+        v = '```' + `${lang}\n` + block.code.rich_text[0].plain_text + '\n```';
       }
       if (block.type === 'heading_1') {
-        v = '# ' + block.heading_1.rich_text[0].plain_text;
-        headers.push({depth: 1, v: block.heading_1.rich_text[0].plain_text});
+        const content = forceMergeTextComponents(
+          processRichText(block.heading_1.rich_text)
+        );
+        v = '# ' + content;
+        headers.push({depth: 1, v: content});
       }
       if (block.type === 'heading_2') {
-        v = '## ' + block.heading_2.rich_text[0].plain_text;
-        headers.push({depth: 2, v: block.heading_2.rich_text[0].plain_text});
+        const content = forceMergeTextComponents(
+          processRichText(block.heading_2.rich_text)
+        );
+        v = '## ' + content;
+        headers.push({depth: 2, v: content});
       }
       if (block.type === 'heading_3') {
-        v = '### ' + block.heading_3.rich_text[0].plain_text;
+        const content = forceMergeTextComponents(
+          processRichText(block.heading_3.rich_text)
+        );
+        v = '### ' + content;
         //headers.push({depth: 3, v: block.heading_3.rich_text[0].plain_text});
       }
       if (block.type === 'image') {
         if (block.image.type === 'external') {
-          const repoMediaDir = 'https://raw.githubusercontent.com/squinky/intrapology-hello-world/main/doc/';
-          const fileName = block.image.external.url.replace(repoMediaDir, '');
-          const relativeURL = `doc/${fileName}`;
+          const repoMediaDir = 'https://github.com/squinky/intrapology-hello-world/raw/main/';
+          const relativeURL = block.image.external.url.replace(repoMediaDir, '');
           const txt =
             block.image.caption.length > 0 ? block.image.caption[0].plain_text :
-            fileName;
-          v = `[${txt}](${relativeURL})`;
+            relativeURL.replace('doc/', '');
+          v = `![${txt}](${relativeURL})`;
         } else {
-          v = 'ERR: skipped image';
+          v = '!ERR: skipped image!';
         }
       }
       if (block.type === 'paragraph') {
@@ -264,7 +279,7 @@ async function getChunksFromBlock(id: string, client: Client, gettingChildren: b
         v = await processTable(block.id, client);
       }
       if (block.type === 'unsupported') {
-        v = `ERR: block type is 'unsupported'`;
+        v = `!ERR: block type is 'unsupported!'`;
       }
       if (block.type === 'video') {
         if (block.video.type === 'external') {
@@ -278,7 +293,7 @@ async function getChunksFromBlock(id: string, client: Client, gettingChildren: b
             v = url;
           }
         } else {
-          v = 'ERR: skipped video';
+          v = `!ERR: skipped video with URL "${block.video.file.url}"!`;
         }
       }
       addChunk(v, block);
@@ -315,7 +330,7 @@ async function getChunksFromBlock(id: string, client: Client, gettingChildren: b
         }
       }
     } else {
-      addChunk('ERR: block does not have type', block);
+      addChunk('!ERR: block does not have type!', block);
     }
   }
 
