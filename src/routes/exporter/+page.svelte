@@ -10,7 +10,7 @@
 {#if form?.md}
 	<h2>Success!</h2>
 	<h3>Here ya go cowboy:</h3>
-	<textarea readonly={true}>{form.md}</textarea>
+	<textarea style="width: 80%; min-height: 60vh" readonly={true}>{form.md}</textarea>
 {:else}
 <h2>push button 2 win</h2>
 <form method="POST">
