@@ -76,40 +76,38 @@ function resolveLinkRefsAndMergeComponents(chunks: Chunk[]): string[] {
         } else {
           const refChunk = chunks.find(c => c.id === textComponent.refID);
           if (refChunk) {
-          if (refChunk.content.t === Content.FinalText) {
-              if (refChunk.content.v.startsWith('#')) {
-              // In this case we have a header
-              const formatted =
-                headerRefFromContent(refChunk.content.v)
-                  .replaceAll('#', '');
-              return str + `[${textComponent.content}](#${formatted})`;
-            }
-            const maybeResolvedLinkString = tryResolveAnchorRef(refChunk.content.v, textComponent.content);
-            if (maybeResolvedLinkString) {
-              return str + maybeResolvedLinkString;
-            } else {
-              throw new Error('problem trying to resolve block link');
-              return str + textComponent.content;
-            }
-          } else {
-            let maybeResolvedLinkString: string | undefined = undefined;
-            for (const refChunkTextComponent of refChunk.content.v) {
-              // In this case we have a link to an anonymous block with an anchor link
-              maybeResolvedLinkString = tryResolveAnchorRef(refChunkTextComponent.content, textComponent.content);
+            if (refChunk.content.t === Content.FinalText) {
+                if (refChunk.content.v.startsWith('#')) {
+                // In this case we have a header
+                const formatted =
+                  headerRefFromContent(refChunk.content.v)
+                    .replaceAll('#', '');
+                return str + `[${textComponent.content}](#${formatted})`;
+              }
+              const maybeResolvedLinkString = tryResolveAnchorRef(refChunk.content.v, textComponent.content);
               if (maybeResolvedLinkString) {
-                break;
+                return str + maybeResolvedLinkString;
+              } else {
+                throw new Error('problem trying to resolve block link');
+                return str + textComponent.content;
+              }
+            } else {
+              let maybeResolvedLinkString: string | undefined = undefined;
+              for (const refChunkTextComponent of refChunk.content.v) {
+                // In this case we have a link to an anonymous block with an anchor link
+                maybeResolvedLinkString = tryResolveAnchorRef(refChunkTextComponent.content, textComponent.content);
+                if (maybeResolvedLinkString) {
+                  break;
+                }
+              }
+              if (maybeResolvedLinkString) {
+                return str + maybeResolvedLinkString;
+              } else {
+                return `ERR: couldn't resolve anchor ref for ID '${textComponent.refID}'; for chunk with content: "${textComponent.content}"`;
               }
             }
-            if (maybeResolvedLinkString) {
-              return str + maybeResolvedLinkString;
-            } else {
-              throw new Error('problem trying to resolve block link');
-              return str + textComponent.content;
-            }
-          }
           } else {
-            throw new Error('problem trying to resolve block link');
-            return str + textComponent.content;
+            return `ERR: couldn't find ref chunk with ID '${textComponent.refID}'; for chunk with content: "${textComponent.content}"`;
           }
         }
       }, '');
