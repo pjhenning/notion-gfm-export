@@ -262,7 +262,7 @@ async function getChunksFromBlock(id: string, client: Client, gettingChildren: b
       }
       if (block.type === 'image') {
         if (block.image.type === 'external') {
-          const repoMediaDir = 'https://github.com/squinky/intrapology-hello-world/raw/main/';
+          const repoMediaDir = 'https://github.com/squinky/intrinsink-hello-world/raw/main/';
           const relativeURL = block.image.external.url.replace(repoMediaDir, '');
           const txt =
             block.image.caption.length > 0 ? block.image.caption[0].plain_text :
