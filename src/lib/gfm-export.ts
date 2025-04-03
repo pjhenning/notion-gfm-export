@@ -6,7 +6,7 @@ function main() {
   //dotenv.config();
   const pageID = '17bddd82c25580f38e27e2376678fe30';
   getMarkdownForPage(pageID, '') // TODO: download file
-    .catch((err) => console.error(err));
+    .catch((err) => console.error('error attempting to get markdown for page:', err));
 }
 
 export async function getMarkdownForPage(pageID: string, notionToken: string) {
