@@ -266,7 +266,7 @@ async function getChunksFromBlock(id: string, client: Client, gettingChildren: b
           const relativeURL = block.image.external.url.replace(repoMediaDir, '');
           const txt =
             block.image.caption.length > 0 ? block.image.caption[0].plain_text :
-            relativeURL.replace('doc/', '');
+            relativeURL.replace('docs/', './');
           v = `![${txt}](${relativeURL})`;
         } else {
           v = '!ERR: skipped image!';
